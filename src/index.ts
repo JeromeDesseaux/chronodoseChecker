@@ -4,34 +4,35 @@ import notifier from 'node-notifier';
 import cron from "node-cron";
 
 
-const CRON_ENABLED = process.env.CRON=="1"?true:false;
+const CRON_ENABLED = process.env.CRON == "1" ? true : false;
 const centers: string[] = [
     "https://www.doctolib.fr/centre-de-sante/rouen/centre-vaccination-cabinet-medical-des-carnes?highlight%5Bspeciality_ids%5D%5B%5D=5494",
     "https://www.doctolib.fr/centre-de-sante/rouen/centre-de-vaccination-covid-vaccinarena-rouen?highlight%5Bspeciality_ids%5D%5B%5D=5494",
     "https://www.doctolib.fr/centre-de-sante/sotteville-les-rouen/centre-de-vaccination-sotteville-les-rouen?highlight%5Bspeciality_ids%5D%5B%5D=5494",
-    "https://www.doctolib.fr/cabinet-medical/duclair/centre-de-vaccination-covid-19-duclair"
+    "https://www.doctolib.fr/cabinet-medical/duclair/centre-de-vaccination-covid-19-duclair",
+    // "https://www.doctolib.fr/centre-de-sante/tille/centre-de-vaccination-du-sdis-60?highlight%5Bspeciality_ids%5D%5B%5D=5494"
 ]
 const vaccineNames: string[] = ['Pfizer', 'Moderna']
 const injectionNumber = 1;
 
 
-const getAllValuesFromSelect = async (page: Page) : Promise<string[]> => {
-    const values: string[]= [];
+const getAllValuesFromSelect = async (page: Page): Promise<string[]> => {
+    const values: string[] = [];
     const selector = await page.$$("#booking_motive option");
-    for(const option of selector){
+    for (const option of selector) {
         const value = await page.evaluate(elem => elem.value, option);
         values.push(value)
     }
     return values;
 }
 
-const filterOptionsValues = (values: string[], vaccineNames: string[], injectionNumber: number = 1|2) : string[]=> {
-    const injectionNumberString = injectionNumber===1?"1re":"2nd";
+const filterOptionsValues = (values: string[], vaccineNames: string[], injectionNumber: number = 1 | 2): string[] => {
+    const injectionNumberString = injectionNumber === 1 ? "1re" : "2nd";
     const newValues: string[] = [];
-    
+
     values.map(value => {
         vaccineNames.map(vn => {
-            if(value.includes(injectionNumberString) && value.toLowerCase().includes(vn.toLowerCase())){
+            if (value.includes(injectionNumberString) && value.toLowerCase().includes(vn.toLowerCase())) {
                 newValues.push(value);
             }
         })
@@ -41,13 +42,13 @@ const filterOptionsValues = (values: string[], vaccineNames: string[], injection
 
 const notify = (URL: string, status: SlotStatus, option: string) => {
     let message = "";
-    if(status == SlotStatus.ERROR || SlotStatus.NONE){
+    if (status === SlotStatus.ERROR || status === SlotStatus.NONE) {
         console.log(`Aucun créneau disponible ${option} au lien ${URL}`);
         return;
     } else {
         message = `Des créneaux de vaccination semblent disponibles pour ${option}! J'ouvre une fenêtre dans votre navigateur!`;
     }
-    open(URL, {app: {name: 'google chrome'}});
+    open(URL, { app: { name: 'google chrome' } });
     notifier.notify({
         title: "Créneaux disponibles !",
         message: message
@@ -56,7 +57,7 @@ const notify = (URL: string, status: SlotStatus, option: string) => {
 }
 
 function delay(time: number) {
-    return new Promise(function(resolve) { 
+    return new Promise(function (resolve) {
         setTimeout(resolve, time)
     });
 }
@@ -90,7 +91,7 @@ const getPage = async (URL: string, browser: Browser): Promise<Page> => {
         'accept-language': 'fr-FR,fr;en-US,en;q=0.9,en;q=0.8'
     })
     try {
-        await page.goto(URL);  
+        await page.goto(URL);
         await page.waitForSelector('#booking_motive');
         return page
     } catch (error) {
@@ -108,15 +109,17 @@ const checkVaccineSlots = async (URL: string, optionValue: string, page: Page): 
     await delay(3000);
     try {
         const elem = await page.waitForSelector('.booking-availabilities span');
-        if(elem) {
+        if (elem) {
             const textContent = await page.$eval('.booking-availabilities span', element => element.innerText);
-            if(textContent.toString().toLowerCase().includes('aucun rendez-vous')){
-                return SlotStatus.NONE;
-            }else{
-                return SlotStatus.ONE_OR_MANY;
-            }
+            console.log(textContent)
+            // if (textContent.toString().toLowerCase().includes('aucun rendez-vous')) {
+            //     return SlotStatus.NONE;
+            // } else {
+            // }
+            if(textContent.toString().includes("VOIR PLUS D'HORAIRES") || textContent.toString().toLowerCase().includes("prochain rdv")) return SlotStatus.ONE_OR_MANY;
+            return SlotStatus.NONE;
         }
-        else{
+        else {
             return SlotStatus.DONT_KNOW;
         }
     } catch (ElementNotFoundException) {
@@ -142,14 +145,14 @@ const start = async (isCron: boolean) => {
     const browser = await puppeteer.launch({
         headless: true,
     });
-    if(isCron){
-        cron.schedule('*/5 * * * *', function() {
+    if (isCron) {
+        cron.schedule('*/5 * * * *', function () {
             console.log('💉 Je (re)lance la recherche ...');
             centers.map(async center => {
                 processCenter(center, browser);
             })
         });
-    }else{
+    } else {
         centers.map(center => processCenter(center, browser));
     }
 }
