@@ -1,0 +1,11 @@
+{
+    "centers": [
+        "https://www.doctolib.fr/centre-de-sante/rouen/centre-vaccination-cabinet-medical-des-carnes?highlight%5Bspeciality_ids%5D%5B%5D=5494",
+        "https://www.doctolib.fr/centre-de-sante/rouen/centre-de-vaccination-covid-vaccinarena-rouen?highlight%5Bspeciality_ids%5D%5B%5D=5494",
+        "https://www.doctolib.fr/centre-de-sante/sotteville-les-rouen/centre-de-vaccination-sotteville-les-rouen?highlight%5Bspeciality_ids%5D%5B%5D=5494",
+        "https://www.doctolib.fr/cabinet-medical/duclair/centre-de-vaccination-covid-19-duclair",
+        "https://www.doctolib.fr/centre-de-sante/saint-aubin-les-elbeuf/centre-de-vaccination-covid-du-territoire-elbeuvien?highlight%5Bspeciality_ids%5D%5B%5D=5494"
+    ],
+    "vaccineNames": ["Pfizer", "Moderna"],
+    "injectionNumber": 1
+}
