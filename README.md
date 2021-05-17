@@ -11,7 +11,7 @@ Avoir installé [nodejs (disponible sur ce lien)](https://nodejs.org/en/) (Je co
 
 - Cloner le repo du projet
 - `yarn install` ou `npm install`
-- Vérifiez les paramètres d'exécution dans le fichier `src/index.ts`. Modifiez la liste `centers` selon les centres qui correspondent à votre domicile. Les liens correspondent à l'URL du centre sur le site [Doctolib](https://doctolib.fr)
+- Vérifiez les paramètres d'exécution dans le fichier `src/config/config.json`. Modifiez la liste `centers` selon les centres qui correspondent à votre domicile. Les liens correspondent à l'URL du centre sur le site [Doctolib](https://doctolib.fr)
 - Exécutez le projet avec `CRON=1 yarn start`
 
 Par défaut (et par respect pour les serveurs de Doctolib), les tâches sont exécutées toutes les 5 minutes. Merci de respecter leur travail et de ne pas recharger les pages trop fréquemment. Cela est inutile et bloque le service fournit par Doctolib dans l'intérêt de tous. Merci pour eux.
